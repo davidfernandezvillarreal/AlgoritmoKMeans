@@ -184,6 +184,11 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 kmeans.leerArchivo(archivo);
                 kmeans.elegirCentroides();
                 kmeans.imprimirCentroidesIniciales();
+                System.out.println("----------------------------------------------------------------");
+                kmeans.calcularDistanciaEuclidiana();
+                kmeans.imprimirDistancias();
+                kmeans.asignarCluster();
+                kmeans.imprimirAsignacionCluster();
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
             } catch (NumberFormatException nfe) {
