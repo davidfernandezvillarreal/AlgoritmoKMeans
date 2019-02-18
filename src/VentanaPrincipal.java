@@ -189,6 +189,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 kmeans.imprimirDistancias();
                 kmeans.asignarCluster();
                 kmeans.imprimirAsignacionCluster();
+                kmeans.calcularNuevosCentroides();
+                kmeans.imprimirNuevosCentroides();
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
             } catch (NumberFormatException nfe) {
