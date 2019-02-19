@@ -24,7 +24,7 @@ public class AlgoritmoKMeans {
     static Vector<Integer> cantidadDeElemPorCluster = new Vector<Integer>();
     static int numDeClusters;
     static int iteracion=0;
-    static int checker=1;
+    static boolean ciclo=true;
     static int numPuntosPorInstancia=4; //registros en el DataSet, aqui uso los iris dataset
     
     static Vector<Double> clusterAsignado;
@@ -54,7 +54,7 @@ public class AlgoritmoKMeans {
         lineScanner.useDelimiter("\t");  
         Vector<Double> instancia = new Vector<Double>();
         
-        for(int col=0;col<numPuntosPorInstancia;col++) {
+        for(int i=0; i<numPuntosPorInstancia; i++) {
             Double punto = lineScanner.nextDouble();
             instancia.add(punto);
         }
@@ -63,8 +63,8 @@ public class AlgoritmoKMeans {
         numDeInstancias++;
     }
     
-    // Elige los centroides de todo el dataset
-    public static void elegirCentroides() {
+    // Elige los primeros elementos como centroides de todo el dataset
+    public static void elegirCentroidesIniciales() {
         for (int i=0; i<numDeClusters; i++) {
             centroides.add(dataSet.get(i));
         }
@@ -73,6 +73,7 @@ public class AlgoritmoKMeans {
     public static void calcularDistanciaEuclidiana() {
         double a=0;
         double res=0;
+        distanciaEuclidiana = new LinkedList<Vector<Double>>();
         
         for (int i=0; i<numDeInstancias; i++) {
             Vector<Double> distancias = new Vector<Double>();
@@ -105,7 +106,7 @@ public class AlgoritmoKMeans {
                 // Encontrar la menor distancia para asignar la instancia a ese cluster
                 if (distanciaMenor>=distanciaEuclidiana.get(i).get(j)) {
                     distanciaMenor = distanciaEuclidiana.get(i).get(j); // Si distanciaMenor es mayor reemplazamos el valor
-                    cluster = j; // Numero de cluster al que pertenece la instancia
+                    cluster = j; // Número de cluster al que pertenece la instancia
                 }
             }
             
@@ -119,11 +120,12 @@ public class AlgoritmoKMeans {
     public static void calcularNuevosCentroides() {
         int instanciasEnCluster=0;
         Vector<Double> sumatoriaDePtsPorIns = new Vector<Double>();
+        cantidadDeElemPorCluster = new Vector<Integer>();
         
         for (int i=0; i<numDeClusters; i++) {
             // cluster = i 
             sumatoriaDePtsPorIns = new Vector<Double>(); // Reutilizamos el vector para el siguiente cluster
-            for (int x=0; x<numPuntosPorInstancia; x++) {
+            for (int x=0; x<numPuntosPorInstancia; x++) { // Inicializamos los puntos necesarios del vector para la sumatoria
                 sumatoriaDePtsPorIns.add(x, 0.0);
             }
             instanciasEnCluster = 0;
@@ -135,7 +137,7 @@ public class AlgoritmoKMeans {
                     }
                 }
                 if (clusterAsignado.get(j)==i) {
-                    instanciasEnCluster++; // Numero de instancias en el cluster
+                    instanciasEnCluster++; // Número de instancias en el cluster
                 }    
             }
             promedioDeInsPorClus.add(sumatoriaDePtsPorIns);
@@ -143,15 +145,15 @@ public class AlgoritmoKMeans {
         }
         
         for (int i=0; i<numDeClusters; i++) {
-            Vector<Double> promediosPtsDelCluster = new Vector<Double>();
+            Vector<Double> promedioPtsDelCluster = new Vector<Double>();
             for (int j=0; j<numPuntosPorInstancia; j++) {
                 if (cantidadDeElemPorCluster.get(i)==0) {
-                    promediosPtsDelCluster.add(0.0);
+                    promedioPtsDelCluster.add(0.0);
                 } else {
-                    promediosPtsDelCluster.add(promedioDeInsPorClus.get(i).get(j)/cantidadDeElemPorCluster.get(i));
+                    promedioPtsDelCluster.add(promedioDeInsPorClus.get(i).get(j)/cantidadDeElemPorCluster.get(i));
                 }
             }
-            promedioDeInsPorClus.set(i, promediosPtsDelCluster);
+            promedioDeInsPorClus.set(i, promedioPtsDelCluster);
         }
         
         centroides = new LinkedList<Vector<Double>>();
@@ -159,52 +161,64 @@ public class AlgoritmoKMeans {
         promedioDeInsPorClus = new LinkedList<Vector<Double>>();
     }
     
-    public static void imprimirCentroidesIniciales() {
-        for (Vector<Double> instancia : centroides) {
-            System.out.print("[");
-            for (Double punto : instancia) {
-                System.out.print(punto + ", ");
+    public static void compararAsignacionDeCluster() {
+        ciclo = false;
+        for (int i=0; i<numDeInstancias; i++) {
+            if (Double.compare(evolucionDeLosClusters.get(iteracion-2).get(i), 
+                    evolucionDeLosClusters.get(iteracion-1).get(i)) != 0) {
+                ciclo = true;
+                break;
             }
-            System.out.print("]\n");
         }
-        //centroidesIniciales.clear();
+    }
+    
+    public static void imprimirCentroides() {
+        System.out.println("============================ CENTROIDES INICIALES =================================");
+        for (Vector<Double> instancias : centroides) 
+            System.out.println(instancias);
     }
     
     public static void imprimirDistancias() {
-        int i=1;
-        for (Vector<Double> distancias : distanciaEuclidiana) {
-            System.out.print(i + ".[");
-            for (Double distancia : distancias) {
-                System.out.print(distancia + ", ");
-            }
-            System.out.print("]\n");
-            i++;
-        }
+        System.out.println("================================= DISTANCIAS ======================================");
+        for (Vector<Double> distancias : distanciaEuclidiana) 
+            System.out.println(distancias);
     }
     
     public static void imprimirAsignacionCluster() {
-        System.out.println("==================================================================================");
+        System.out.println("================================ AGRUPACIÓN =======================================");
         int i=0;
-        for (Vector<Double> instancias : dataSet) {
-            System.out.print((i+1) + ".[");
-            for (Double puntos : instancias) {
-                System.out.print(puntos + ", ");
+        for (Vector<Double> instancias : dataSet) 
+            System.out.println(instancias + " C: " + clusterAsignado.get(i++));
+    }
+    
+    public static void imprimirClusters() {
+        System.out.println("================================== CLUSTERS ======================================");
+        for (int i=0; i<numDeClusters; i++) {
+            System.out.println("CLUSTER " + (i+1));
+            for (int j=0; j<numDeInstancias; j++) {
+                if (evolucionDeLosClusters.getLast().get(j)==i) {
+                    System.out.println(dataSet.get(j));
+                } 
             }
-            System.out.print("] C: " + clusterAsignado.get(i) + "\n");
-            i++;
         }
     }
     
-    public static void imprimirNuevosCentroides() {
-        System.out.println("============================== NUEVOS CENTROIDES =================================");
-        int i=0;
-        for (Vector<Double> nuevosCentroides : centroides) {
-            System.out.print((i+1) + ".[");
-            for (Double puntos : nuevosCentroides) {
-                System.out.print(puntos + ", ");
-            }
-            System.out.print("]\n");
-            i++;
+    public static void ejecutarKMeans() {
+        /*
+           Primera agrupación  
+        */
+        elegirCentroidesIniciales();
+        calcularDistanciaEuclidiana();
+        asignarCluster();
+        
+        while (ciclo) {
+            System.out.println("--------------------------- ITERACION " + iteracion + " ----------------------------------");
+            calcularNuevosCentroides();
+            calcularDistanciaEuclidiana();
+            asignarCluster();
+            compararAsignacionDeCluster();
         }
+        
+        imprimirClusters();
     }
 }

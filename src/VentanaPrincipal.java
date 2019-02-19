@@ -20,7 +20,7 @@ import javax.swing.JTextField;
  */
 public class VentanaPrincipal extends javax.swing.JFrame {
 
-    private File archivo;
+    private File archivo = new File("C:\\Users\\David\\Documents\\Instituto Tecnológico Superior de Jerez\\10 SEMESTRE\\Aprendizaje Maquina\\iris.txt");
     AlgoritmoKMeans kmeans;
 
     public void setArchivo(File archivo) {
@@ -38,7 +38,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
      */
     public VentanaPrincipal() {
         initComponents();
-        btnEjecutar.setEnabled(false);
+        cajaNombreDB.setText(archivo.getName());
         setLocationRelativeTo(null);
     }
 
@@ -180,17 +180,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         } else {
             try {
                 kmeans = new AlgoritmoKMeans(Integer.parseInt(cajaK.getText()));
-                
                 kmeans.leerArchivo(archivo);
-                kmeans.elegirCentroides();
-                kmeans.imprimirCentroidesIniciales();
-                System.out.println("----------------------------------------------------------------");
-                kmeans.calcularDistanciaEuclidiana();
-                kmeans.imprimirDistancias();
-                kmeans.asignarCluster();
-                kmeans.imprimirAsignacionCluster();
-                kmeans.calcularNuevosCentroides();
-                kmeans.imprimirNuevosCentroides();
+                kmeans.ejecutarKMeans();
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
             } catch (NumberFormatException nfe) {
