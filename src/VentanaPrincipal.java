@@ -2,12 +2,21 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -22,6 +31,7 @@ import javax.swing.JTextField;
 public class VentanaPrincipal extends javax.swing.JFrame {
 
     private File archivo = new File("C:\\Users\\David\\Documents\\Instituto Tecnológico Superior de Jerez\\10 SEMESTRE\\Aprendizaje Maquina\\iris.txt");
+    private static LinkedList<LinkedList<Vector<Double>>> clusters = new LinkedList<LinkedList<Vector<Double>>>();
     AlgoritmoKMeans kmeans;
 
     public void setArchivo(File archivo) {
@@ -31,8 +41,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     public File getArchivo() {
         return archivo;
     }
-    
-    
     
     /**
      * Creates new form VentanaPrincipal
@@ -63,6 +71,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         cajaClusters = new javax.swing.JTextArea();
         jLabel4 = new javax.swing.JLabel();
+        btnGraficar = new javax.swing.JButton();
 
         jButton1.setText("jButton1");
 
@@ -118,6 +127,13 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel4.setText("CLUSTERS");
 
+        btnGraficar.setText("Graficar");
+        btnGraficar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGraficarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -127,9 +143,9 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addGap(0, 315, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
                             .addComponent(jLabel3))
@@ -141,15 +157,16 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                                 .addComponent(btnSeleccionarArchivos))
                             .addComponent(cajaK)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(146, 146, 146)
-                        .addComponent(btnEjecutar, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnEjecutar, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 149, Short.MAX_VALUE)
+                        .addComponent(btnGraficar, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1)
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel4)
-                .addGap(142, 142, 142))
+                .addGap(144, 144, 144))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -169,9 +186,12 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(cajaK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel3))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 383, Short.MAX_VALUE)
-                        .addComponent(btnEjecutar, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnEjecutar, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnGraficar, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -204,11 +224,11 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         } else {
             try {
                 cajaClusters.setText("");
+                kmeans.restablecerValores();
                 kmeans = new AlgoritmoKMeans(Integer.parseInt(cajaK.getText()));
                 kmeans.leerArchivo(archivo);
                 kmeans.ejecutarKMeans();
                 kmeans.imprimirClusters(cajaClusters);
-                kmeans.restablecerValores();
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
             } catch (NumberFormatException nfe) {
@@ -220,6 +240,32 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private void cajaKKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cajaKKeyReleased
         // TODO add your handling code here:
     }//GEN-LAST:event_cajaKKeyReleased
+
+    private void btnGraficarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGraficarActionPerformed
+        // TODO add your handling code here:
+        clusters = new LinkedList<LinkedList<Vector<Double>>>();
+        clusters = kmeans.guardarDatosEnClusters();
+        XYSeriesCollection datos = new XYSeriesCollection();
+        XYSeries serie;
+        for (int i=0; i<clusters.size(); i++) {
+            serie = new XYSeries("Cluster " + (i+1));
+            for (int j=0; j<clusters.get(i).size(); j++) {
+                serie.add(clusters.get(i).get(j).get(2), clusters.get(i).get(j).get(0));
+            }
+            datos.addSeries(serie);
+        }
+        
+        JFreeChart chart = ChartFactory.createXYLineChart(archivo.getName(), "petal length", "sepal length", datos);
+        XYPlot plot = chart.getXYPlot();
+        
+        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        plot.setRenderer(renderer);
+        
+        ChartFrame frame = new ChartFrame("Algoritmo K-Means", chart);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }//GEN-LAST:event_btnGraficarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -278,6 +324,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEjecutar;
+    private javax.swing.JButton btnGraficar;
     private javax.swing.JButton btnSeleccionarArchivos;
     private javax.swing.JTextArea cajaClusters;
     private javax.swing.JTextField cajaK;

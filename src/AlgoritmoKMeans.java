@@ -28,8 +28,9 @@ public class AlgoritmoKMeans {
     private static boolean ciclo=true;
     private static int numPuntosPorInstancia=0; 
     
-    static Vector<Double> clusterAsignado;
-    static LinkedList<Vector<Double>> evolucionDeLosClusters = new LinkedList<Vector<Double>>();
+    private static Vector<Double> clusterAsignado;
+    private static LinkedList<Vector<Double>> evolucionDeLosClusters = new LinkedList<Vector<Double>>();
+    private static LinkedList<LinkedList<Vector<Double>>> clusters = new LinkedList<LinkedList<Vector<Double>>>();
     
     public AlgoritmoKMeans(int numDeClusters) {
         AlgoritmoKMeans.numDeClusters = numDeClusters;
@@ -213,7 +214,7 @@ public class AlgoritmoKMeans {
             System.out.println("Cantidad de instancias \nen el cluster: " + cantidadDeElemPorCluster.get(i));
         }
     }
-   
+    
     public static void imprimirClusters(JTextArea cajaClusters) {
         cajaClusters.setText(cajaClusters.getText() + "---------------------- Numero de iteraciones: " + iteracion + " ----------------------\n");
         for (int i=0; i<numDeClusters; i++) {
@@ -225,6 +226,21 @@ public class AlgoritmoKMeans {
             }
             cajaClusters.setText(cajaClusters.getText() + "Cantidad de instancias: " + cantidadDeElemPorCluster.get(i) + "\n");
         }
+    }
+    
+    public static LinkedList<LinkedList<Vector<Double>>> guardarDatosEnClusters() {
+        clusters = new LinkedList<LinkedList<Vector<Double>>>();
+        LinkedList<Vector<Double>> cluster = new LinkedList<Vector<Double>>();
+        for (int i=0; i<numDeClusters; i++) {
+            cluster = new LinkedList<Vector<Double>>();
+            for (int j=0; j<numDeInstancias; j++) {
+                if (evolucionDeLosClusters.getLast().get(j)==i) {
+                    cluster.add(dataSet.get(j));
+                }
+            }
+            clusters.add(cluster);
+        }
+        return clusters;
     }
     
     public static void restablecerValores() {
