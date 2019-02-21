@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.Vector;
+import javax.swing.JTextArea;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -16,16 +17,16 @@ import java.util.Vector;
  * @author David
  */
 public class AlgoritmoKMeans {
-    static int numDeInstancias = 0;
-    static LinkedList<Vector<Double>> dataSet = new LinkedList<Vector<Double>>();
-    static LinkedList<Vector<Double>> distanciaEuclidiana = new LinkedList<Vector<Double>>();
-    static LinkedList<Vector<Double>> centroides = new LinkedList<Vector<Double>>();
-    static LinkedList<Vector<Double>> promedioDeInsPorClus = new LinkedList<Vector<Double>>();
-    static Vector<Integer> cantidadDeElemPorCluster = new Vector<Integer>();
-    static int numDeClusters;
-    static int iteracion=0;
-    static boolean ciclo=true;
-    static int numPuntosPorInstancia=4; //registros en el DataSet, aqui uso los iris dataset
+    private static int numDeInstancias=0;
+    private static LinkedList<Vector<Double>> dataSet = new LinkedList<Vector<Double>>();
+    private static LinkedList<Vector<Double>> distanciaEuclidiana = new LinkedList<Vector<Double>>();
+    private static LinkedList<Vector<Double>> centroides = new LinkedList<Vector<Double>>();
+    private static LinkedList<Vector<Double>> promedioDeInsPorClus = new LinkedList<Vector<Double>>();
+    private static Vector<Integer> cantidadDeElemPorCluster = new Vector<Integer>();
+    private static int numDeClusters;
+    private static int iteracion=0;
+    private static boolean ciclo=true;
+    private static int numPuntosPorInstancia=0; 
     
     static Vector<Double> clusterAsignado;
     static LinkedList<Vector<Double>> evolucionDeLosClusters = new LinkedList<Vector<Double>>();
@@ -33,30 +34,38 @@ public class AlgoritmoKMeans {
     public AlgoritmoKMeans(int numDeClusters) {
         AlgoritmoKMeans.numDeClusters = numDeClusters;
     }
+
+    public static LinkedList<Vector<Double>> getDataSet() {
+        return dataSet;
+    }
+
+    public static Vector<Integer> getCantidadDeElemPorCluster() {
+        return cantidadDeElemPorCluster;
+    }
     
     // Lee el archivo
     public static void leerArchivo(File archivo) throws FileNotFoundException {
         Scanner scanner = new Scanner(archivo);//Dataset path
         scanner.useDelimiter(System.getProperty("line.separator"));
-        int lineNo = 0;
         
         while (scanner.hasNext()) {
-            analizarLinea(scanner.next(),lineNo);
-            lineNo++;
+            analizarLinea(scanner.next());
         }
-             // System.out.println("total"+num); PRINT THE TOTAL
+        
         scanner.close();
     }
     
     // Analiza cada línea del archivo y separa los datos por tablulaciones
-    public static void analizarLinea(String line,int lineNo) { 
+    public static void analizarLinea(String line) { 
         Scanner lineScanner = new Scanner(line);
         lineScanner.useDelimiter("\t");  
         Vector<Double> instancia = new Vector<Double>();
         
-        for(int i=0; i<numPuntosPorInstancia; i++) {
+        numPuntosPorInstancia=0;
+        while (lineScanner.hasNext()) {
             Double punto = lineScanner.nextDouble();
             instancia.add(punto);
+            numPuntosPorInstancia++;
         }
         
         dataSet.add(instancia);
@@ -192,15 +201,43 @@ public class AlgoritmoKMeans {
     }
     
     public static void imprimirClusters() {
+        System.out.println("Numero de iteraciones: " + iteracion);
         System.out.println("================================== CLUSTERS ======================================");
         for (int i=0; i<numDeClusters; i++) {
             System.out.println("CLUSTER " + (i+1));
             for (int j=0; j<numDeInstancias; j++) {
                 if (evolucionDeLosClusters.getLast().get(j)==i) {
                     System.out.println(dataSet.get(j));
-                } 
+                }
             }
+            System.out.println("Cantidad de instancias \nen el cluster: " + cantidadDeElemPorCluster.get(i));
         }
+    }
+   
+    public static void imprimirClusters(JTextArea cajaClusters) {
+        cajaClusters.setText(cajaClusters.getText() + "---------------------- Numero de iteraciones: " + iteracion + " ----------------------\n");
+        for (int i=0; i<numDeClusters; i++) {
+            cajaClusters.setText(cajaClusters.getText() + "--------- CLUSTER " + (i+1) + " ---------\n");
+            for (int j=0; j<numDeInstancias; j++) {
+                if (evolucionDeLosClusters.getLast().get(j)==i) {
+                    cajaClusters.setText(cajaClusters.getText() + dataSet.get(j) + "\n");
+                }
+            }
+            cajaClusters.setText(cajaClusters.getText() + "Cantidad de instancias: " + cantidadDeElemPorCluster.get(i) + "\n");
+        }
+    }
+    
+    public static void restablecerValores() {
+        numDeInstancias=0;
+        dataSet = new LinkedList<Vector<Double>>();
+        distanciaEuclidiana = new LinkedList<Vector<Double>>();
+        centroides = new LinkedList<Vector<Double>>();
+        promedioDeInsPorClus = new LinkedList<Vector<Double>>();
+        cantidadDeElemPorCluster = new Vector<Integer>();
+        iteracion=0;
+        ciclo=true;
+        numPuntosPorInstancia=0; 
+        evolucionDeLosClusters = new LinkedList<Vector<Double>>();
     }
     
     public static void ejecutarKMeans() {
@@ -212,13 +249,10 @@ public class AlgoritmoKMeans {
         asignarCluster();
         
         while (ciclo) {
-            System.out.println("--------------------------- ITERACION " + iteracion + " ----------------------------------");
             calcularNuevosCentroides();
             calcularDistanciaEuclidiana();
             asignarCluster();
             compararAsignacionDeCluster();
         }
-        
-        imprimirClusters();
     }
 }
