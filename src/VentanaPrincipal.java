@@ -60,7 +60,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         cajaK = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -72,8 +71,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         cajaClusters = new javax.swing.JTextArea();
         jLabel4 = new javax.swing.JLabel();
         btnGraficar = new javax.swing.JButton();
-
-        jButton1.setText("jButton1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -141,7 +138,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(291, 291, 291)
                 .addComponent(jLabel1)
-                .addGap(0, 315, Short.MAX_VALUE))
+                .addGap(0, 329, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -160,7 +157,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                         .addComponent(btnEjecutar, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 149, Short.MAX_VALUE)
                         .addComponent(btnGraficar, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
+                .addGap(29, 29, 29)
                 .addComponent(jScrollPane1)
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -177,6 +174,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
@@ -190,8 +188,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnEjecutar, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnGraficar, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE))
+                        .addGap(0, 386, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -230,7 +227,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 kmeans.ejecutarKMeans();
                 kmeans.imprimirClusters(cajaClusters);
             } catch (FileNotFoundException ex) {
-                Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(this, "Archivo no encontrado", "Advertencia", HEIGHT);
             } catch (NumberFormatException nfe) {
                 JOptionPane.showMessageDialog(this, "Ingrese un número", "Advertencia", HEIGHT);
             }
@@ -250,7 +247,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         for (int i=0; i<clusters.size(); i++) {
             serie = new XYSeries("Cluster " + (i+1));
             for (int j=0; j<clusters.get(i).size(); j++) {
-                serie.add(clusters.get(i).get(j).get(2), clusters.get(i).get(j).get(0));
+                serie.add(clusters.get(i).get(j).get(1), clusters.get(i).get(j).get(0));
             }
             datos.addSeries(serie);
         }
@@ -329,7 +326,6 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private javax.swing.JTextArea cajaClusters;
     private javax.swing.JTextField cajaK;
     private javax.swing.JTextField cajaNombreDB;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

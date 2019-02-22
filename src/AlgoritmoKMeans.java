@@ -2,6 +2,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.Vector;
 import javax.swing.JTextArea;
@@ -73,10 +74,10 @@ public class AlgoritmoKMeans {
         numDeInstancias++;
     }
     
-    // Elige los primeros elementos como centroides de todo el dataset
+    // Elige aleatoriamente los centroides iniciales
     public static void elegirCentroidesIniciales() {
         for (int i=0; i<numDeClusters; i++) {
-            centroides.add(dataSet.get(i));
+            centroides.add(dataSet.get(new Random().nextInt(numDeInstancias)));
         }
     }
     
