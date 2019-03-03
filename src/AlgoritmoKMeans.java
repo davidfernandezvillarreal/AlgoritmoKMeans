@@ -19,25 +19,25 @@ import javax.swing.JTextArea;
  */
 public class AlgoritmoKMeans {
     private static int numDeInstancias=0;
-    private static LinkedList<Vector<Double>> dataSet = new LinkedList<Vector<Double>>();
+    private static LinkedList<Vector<Object>> dataSet = new LinkedList<Vector<Object>>();
     private static LinkedList<Vector<Double>> distanciaEuclidiana = new LinkedList<Vector<Double>>();
-    private static LinkedList<Vector<Double>> centroides = new LinkedList<Vector<Double>>();
-    private static LinkedList<Vector<Double>> promedioDeInsPorClus = new LinkedList<Vector<Double>>();
+    private static LinkedList<Vector<Object>> centroides = new LinkedList<Vector<Object>>();
+    private static LinkedList<Vector<Object>> promedioDeInsPorClus = new LinkedList<Vector<Object>>();
     private static Vector<Integer> cantidadDeElemPorCluster = new Vector<Integer>();
     private static int numDeClusters;
     private static int iteracion=0;
     private static boolean ciclo=true;
     private static int numPuntosPorInstancia=0; 
     
-    private static Vector<Double> clusterAsignado;
-    private static LinkedList<Vector<Double>> evolucionDeLosClusters = new LinkedList<Vector<Double>>();
-    private static LinkedList<LinkedList<Vector<Double>>> clusters = new LinkedList<LinkedList<Vector<Double>>>();
+    private static Vector<Integer> clusterAsignado;
+    private static LinkedList<Vector<Integer>> evolucionDeLosClusters = new LinkedList<Vector<Integer>>();
+    private static LinkedList<LinkedList<Vector<Object>>> clusters = new LinkedList<LinkedList<Vector<Object>>>();
     
     public AlgoritmoKMeans(int numDeClusters) {
         AlgoritmoKMeans.numDeClusters = numDeClusters;
     }
 
-    public static LinkedList<Vector<Double>> getDataSet() {
+    public static LinkedList<Vector<Object>> getDataSet() {
         return dataSet;
     }
 
@@ -60,12 +60,12 @@ public class AlgoritmoKMeans {
     // Analiza cada línea del archivo y separa los datos por tablulaciones
     public static void analizarLinea(String line) { 
         Scanner lineScanner = new Scanner(line);
-        lineScanner.useDelimiter("\t");  
-        Vector<Double> instancia = new Vector<Double>();
+        lineScanner.useDelimiter(",");  
+        Vector<Object> instancia = new Vector<Object>();
         
         numPuntosPorInstancia=0;
         while (lineScanner.hasNext()) {
-            Double punto = lineScanner.nextDouble();
+            Object punto = lineScanner.next();
             instancia.add(punto);
             numPuntosPorInstancia++;
         }
@@ -91,12 +91,15 @@ public class AlgoritmoKMeans {
             for (int j=0; j<numDeClusters; j++) {
                 res=0;
                 for (int k=0; k<numPuntosPorInstancia; k++) {
+                    try {
                     /*
                      * Formula para la distancia euclidiana RaizCuadrada( Sumatoria( (bi-ai)^2 ) )
                      */
-                    a = (centroides.get(j).get(k) - dataSet.get(i).get(k));
+                    a = (Double.parseDouble(String.valueOf(centroides.get(j).get(k))) - 
+                            Double.parseDouble(String.valueOf(dataSet.get(i).get(k))));
                     a = a * a;
                     res = res + a;
+                    } catch (NumberFormatException nfe) {} // Atrapar la excepción para los puntos que no sean numéricos
                 }
                 res = Math.sqrt(res);
                 distancias.add(res);
@@ -107,8 +110,8 @@ public class AlgoritmoKMeans {
     
     public static void asignarCluster() {
         double distanciaMenor;
-        double cluster;
-        clusterAsignado = new Vector<Double>();
+        int cluster;
+        clusterAsignado = new Vector<Integer>();
         
         for (int i=0; i<numDeInstancias; i++) {
             cluster=1;
@@ -130,12 +133,12 @@ public class AlgoritmoKMeans {
     
     public static void calcularNuevosCentroides() {
         int instanciasEnCluster=0;
-        Vector<Double> sumatoriaDePtsPorIns = new Vector<Double>();
+        Vector<Object> sumatoriaDePtsPorIns = new Vector<Object>();
         cantidadDeElemPorCluster = new Vector<Integer>();
         
         for (int i=0; i<numDeClusters; i++) {
             // cluster = i 
-            sumatoriaDePtsPorIns = new Vector<Double>(); // Reutilizamos el vector para el siguiente cluster
+            sumatoriaDePtsPorIns = new Vector<Object>(); // Reutilizamos el vector para el siguiente cluster
             for (int x=0; x<numPuntosPorInstancia; x++) { // Inicializamos los puntos necesarios del vector para la sumatoria
                 sumatoriaDePtsPorIns.add(x, 0.0);
             }
@@ -144,7 +147,11 @@ public class AlgoritmoKMeans {
             for (int j=0; j<numDeInstancias; j++) {
                 for (int k=0; k<numPuntosPorInstancia; k++) {
                     if (clusterAsignado.get(j)==i) {
-                        sumatoriaDePtsPorIns.set(k, sumatoriaDePtsPorIns.get(k)+dataSet.get(j).get(k));
+                        try {
+                            sumatoriaDePtsPorIns.set(k, Double.parseDouble(sumatoriaDePtsPorIns.get(k)+"") + 
+                                    Double.parseDouble(dataSet.get(j).get(k)+""));
+                        } catch (NumberFormatException nfe) {} // Excepción para los puntos que no son numéricos 
+                        
                     }
                 }
                 if (clusterAsignado.get(j)==i) {
@@ -156,20 +163,20 @@ public class AlgoritmoKMeans {
         }
         
         for (int i=0; i<numDeClusters; i++) {
-            Vector<Double> promedioPtsDelCluster = new Vector<Double>();
+            Vector<Object> promedioPtsDelCluster = new Vector<Object>();
             for (int j=0; j<numPuntosPorInstancia; j++) {
                 if (cantidadDeElemPorCluster.get(i)==0) {
                     promedioPtsDelCluster.add(0.0);
                 } else {
-                    promedioPtsDelCluster.add(promedioDeInsPorClus.get(i).get(j)/cantidadDeElemPorCluster.get(i));
+                    promedioPtsDelCluster.add(Double.parseDouble(promedioDeInsPorClus.get(i).get(j)+"")/cantidadDeElemPorCluster.get(i));
                 }
             }
             promedioDeInsPorClus.set(i, promedioPtsDelCluster);
         }
         
-        centroides = new LinkedList<Vector<Double>>();
+        centroides = new LinkedList<Vector<Object>>();
         centroides = promedioDeInsPorClus;
-        promedioDeInsPorClus = new LinkedList<Vector<Double>>();
+        promedioDeInsPorClus = new LinkedList<Vector<Object>>();
     }
     
     public static void compararAsignacionDeCluster() {
@@ -183,9 +190,15 @@ public class AlgoritmoKMeans {
         }
     }
     
+    public static void imprimirDataset() {
+        System.out.println("=================================== DATASET ========================================");
+        for (Vector<Object> instancias : dataSet) 
+            System.out.println(instancias);
+    }
+    
     public static void imprimirCentroides() {
         System.out.println("============================ CENTROIDES INICIALES =================================");
-        for (Vector<Double> instancias : centroides) 
+        for (Vector<Object> instancias : centroides) 
             System.out.println(instancias);
     }
     
@@ -198,7 +211,7 @@ public class AlgoritmoKMeans {
     public static void imprimirAsignacionCluster() {
         System.out.println("================================ AGRUPACIÓN =======================================");
         int i=0;
-        for (Vector<Double> instancias : dataSet) 
+        for (Vector<Object> instancias : dataSet) 
             System.out.println(instancias + " C: " + clusterAsignado.get(i++));
     }
     
@@ -229,11 +242,11 @@ public class AlgoritmoKMeans {
         }
     }
     
-    public static LinkedList<LinkedList<Vector<Double>>> guardarDatosEnClusters() {
-        clusters = new LinkedList<LinkedList<Vector<Double>>>();
-        LinkedList<Vector<Double>> cluster = new LinkedList<Vector<Double>>();
+    public static LinkedList<LinkedList<Vector<Object>>> guardarDatosEnClusters() {
+        clusters = new LinkedList<LinkedList<Vector<Object>>>();
+        LinkedList<Vector<Object>> cluster = new LinkedList<Vector<Object>>();
         for (int i=0; i<numDeClusters; i++) {
-            cluster = new LinkedList<Vector<Double>>();
+            cluster = new LinkedList<Vector<Object>>();
             for (int j=0; j<numDeInstancias; j++) {
                 if (evolucionDeLosClusters.getLast().get(j)==i) {
                     cluster.add(dataSet.get(j));
@@ -246,15 +259,15 @@ public class AlgoritmoKMeans {
     
     public static void restablecerValores() {
         numDeInstancias=0;
-        dataSet = new LinkedList<Vector<Double>>();
+        dataSet = new LinkedList<Vector<Object>>();
         distanciaEuclidiana = new LinkedList<Vector<Double>>();
-        centroides = new LinkedList<Vector<Double>>();
-        promedioDeInsPorClus = new LinkedList<Vector<Double>>();
+        centroides = new LinkedList<Vector<Object>>();
+        promedioDeInsPorClus = new LinkedList<Vector<Object>>();
         cantidadDeElemPorCluster = new Vector<Integer>();
         iteracion=0;
         ciclo=true;
         numPuntosPorInstancia=0; 
-        evolucionDeLosClusters = new LinkedList<Vector<Double>>();
+        evolucionDeLosClusters = new LinkedList<Vector<Integer>>();
     }
     
     public static void ejecutarKMeans() {
