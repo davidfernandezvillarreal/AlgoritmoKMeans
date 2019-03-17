@@ -24,7 +24,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class VentanaPrincipal extends javax.swing.JFrame {
 
-    private File archivo = new File("C:\\Users\\David\\Documents\\Instituto Tecnológico Superior de Jerez\\10 SEMESTRE\\Aprendizaje Maquina\\iris.txt");
+    private File archivo = new File("C:\\Users\\David\\Documents\\Instituto Tecnológico Superior de Jerez\\10 SEMESTRE\\Aprendizaje Maquina\\Apuntes\\iris.txt");
     private static LinkedList<LinkedList<Vector<Object>>> clusters = new LinkedList<LinkedList<Vector<Object>>>();
     AlgoritmoKMeans kmeans;
 

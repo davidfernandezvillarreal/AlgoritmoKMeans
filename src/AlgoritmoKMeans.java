@@ -17,6 +17,20 @@ import javax.swing.JTextArea;
  *
  * @author David
  */
+
+/**
+ *  
+ * Autor: David Fernandez Villarreal
+ * 
+ * Para el uso del algoritmo KMeans es necesario tener una base de datos
+ * donde cada dato esté separado por comas (,) en un archivo .txt. 
+ * El usuario tendrá que ingresar el número de cluster en los que se 
+ * agruparan los datos.
+ * 
+ * Importante: El algoritmo calcula las distancias, por lo que los datos que 
+ * no sean numérico no se tomarán en cuenta.
+ */
+
 public class AlgoritmoKMeans {
     private static int numDeInstancias=0;
     private static LinkedList<Vector<Object>> dataSet = new LinkedList<Vector<Object>>();
@@ -57,7 +71,7 @@ public class AlgoritmoKMeans {
         scanner.close();
     }
     
-    // Analiza cada línea del archivo y separa los datos por tablulaciones
+    // Analiza cada línea del archivo y separa los datos por comas(,)
     public static void analizarLinea(String line) { 
         Scanner lineScanner = new Scanner(line);
         lineScanner.useDelimiter(",");  
